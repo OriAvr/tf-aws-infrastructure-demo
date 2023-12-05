@@ -26,3 +26,28 @@ resource "aws_s3_bucket_acl" "acl_example" {
   bucket = aws_s3_bucket.my_bucket.id
   acl    = "private"
 }
+
+resource "aws_s3_bucket_policy" "allow_access_from_private_subnet" {
+  bucket = aws_s3_bucket.my_bucket.arn
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::/*"
+      ],
+      "Effect": "Allow",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": "10.0.1.0/24"
+        }
+      }
+    }
+  ]
+}
+POLICY
+
+}
